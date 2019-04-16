@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/css/index.css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <title>Email authorizer</title>
+</head>
+<body data-gr-c-s-loaded="true">
+<div class="main">
+
+    <section class="signup">
+        <!-- <img src="images/signup-bg.jpg" alt=""> -->
+        <div class="container">
+            <div class="signup-content">
+                <form onsubmit="return false" id="signup-form" class="signup-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <p><b><%= data.email %></b> попросил вас выполнить команду:</p>
+                            <!--<label for="first_name">Имя</label>-->
+                            <p><b>original</b>: <span id="cmd"><%= data.cmd %></span></p>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <p> <i class="fas fa-exclamation-triangle"></i> изучите ASCII-вариант чтобы убедиться что нет скрытых символов:</p>
+                            <p><b>ASCII</b>: <%= data.cmd %></p>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input type="checkbox" id="isSendFullOutput" checked>
+                            <label for="sendUsrRes">НЕ отправлять пользователю вывод команды. Отправить лишь сообщение о том что команда была все-таки запущена.</label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <button type="submit" name="submit" id="submit" class="form-submit" >Выполнить <i class="fas fa-spinner fa-pulse loadingIcon" id="loadingIcon"></i></button>
+
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <div id="res">
+                                <div id="output"></div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<form onsubmit="return false">
+    <div class="form" id="resForm" style="display: none;">
+        <p>Результат:</p>
+        <div id="result"></div>
+        <div id="output"></div>
+        <button type="submit" id="sendRes">Отправить результат</button>
+    </div>
+</form>
+<script
+        src="https://code.jquery.com/jquery-3.3.1.js"
+        integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+        crossorigin="anonymous"></script>
+<script type="text/javascript">
+    const currentPageID = window.location.href.match(/\d+/g)[1];
+    $('#submit').on('click', function (e) {
+        $('.fa-spinner').show();
+       const command = $('#cmd').text();
+
+       $.ajax({
+           type: 'POST',
+           data: {command: command, isShowRes: true, id: currentPageID},
+           url: '/doCmd',
+           success: function(data){
+               console.info('success');
+               $('.fa-spinner').hide();
+               if(data.res === 'success'){
+                console.log(data.output);
+                $('#output').html(data.output);
+               }
+               else{
+                   $('#output').css('background', '')
+                 $('#output').html(data.output);
+              }
+               sendRes(data.output);
+           }
+       });
+    });
+
+    const sendRes = (output) => {
+        const isSendFullOutput = $('#isSendFullOutput').prop('checked');
+        console.log(isSendFullOutput);
+        //var res = 'true';
+        $.ajax({
+            type: 'POST',
+            data: {id: currentPageID, sShowFullOut: isSendFullOutput},
+            url: '/sendRes',
+            success: function (data) {
+                console.log(data);
+            }
+        })
+    }
+</script>
+</body>
+</html>

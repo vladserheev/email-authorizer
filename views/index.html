@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+ <link rel="stylesheet" href="/css/index.css">
+  <!--<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">-->
+  <title>Email authorizer</title>
+</head>
+<!--<nav class="navbar navbar-light bg-light">-->
+  <!--<span class="navbar-brand mb-0 h1">Email authorizer</span>-->
+<!--</nav>-->
+  <!--<form onsubmit="return false">-->
+    <!--<p>Введите адресс ел.почты</p>-->
+    <!--<input type="text" value='serheyev_vladyslav@gymnasium9.kr.ua' id="email">-->
+    <!--<p>Введите команду</p>-->
+    <!--<input type="text" value="node -v" id="cmd">-->
+    <!--<p>Введитен причину</p>-->
+    <!--<input type="text" value="" id="description">-->
+    <!--<input type="submit" id="submit" value="Отправить">-->
+  <!--</form>-->
+  <!--<p id="res"></p>-->
+
+
+<!--<body class="form-v5">-->
+<!--<div class="page-content">-->
+  <!--<div class="form-v5-content">-->
+    <!--<form class="form-detail" onsubmit="return false">-->
+      <!--<h2>Email authorizer</h2>-->
+      <!--<div class="form-row">-->
+        <!--<label for="email">Введите адресс ел. почты</label>-->
+        <!--<input type="text" name="your-email" id="email" class="input-text" placeholder="Ел. почта" required pattern="[^@]+@[^@]+.[a-zA-Z]{2,6}">-->
+        <!--<i class="fas fa-envelope"></i>-->
+      <!--</div>-->
+      <!--<div class="form-row">-->
+        <!--<label for="cmd">Введите команду</label>-->
+        <!--<input type="text" name="password" id="cmd" class="input-text" placeholder="Команда" required>-->
+        <!--<i class="fas fa-lock"></i>-->
+      <!--</div>-->
+      <!--<div class="form-row">-->
+        <!--<label for="description">Введите причину</label>-->
+        <!--<input type="text" name="your-email" id="description" class="input-text" placeholder="Причина" required>-->
+        <!--<i class="fas fa-envelope"></i>-->
+      <!--</div>-->
+      <!--<div class="form-row-last">-->
+        <!--<input type="submit" id="submit" name="register" class="register" value="Отправить">-->
+      <!--</div>-->
+    <!--</form>-->
+    <!--<div id="res"></div>-->
+  <!--</div>-->
+<!--</div>&lt;!&ndash; This templates was made by Colorlib (https://colorlib.com) &ndash;&gt;-->
+<body data-gr-c-s-loaded="true">
+<div class="main">
+
+  <section class="signup">
+    <!-- <img src="images/signup-bg.jpg" alt=""> -->
+    <div class="container">
+      <div class="signup-content">
+        <form onsubmit="return false" id="signup-form" class="signup-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="first_name">Имя</label>
+              <input type="text" class="form-input" name="first_name" id="first_name" />
+            </div>
+            <div class="form-group">
+              <label for="last_name">Фамилия</label>
+              <input type="text" class="form-input" name="last_name" id="last_name" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="email">Ел. почта</label>
+            <input type="email" class="form-input" name="email" id="email" />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="cmd">Команда</label>
+              <input type="text" class="form-input" name="cmd" id="cmd"/>
+            </div>
+            <div class="form-group">
+              <label for="description">Причина</label>
+              <input type="text" class="form-input" name="description" id="description"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <input type="submit" name="submit" id="submit" class="form-submit" value="Отправить"/>
+          </div>
+          <p id="res"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script
+        src="https://code.jquery.com/jquery-3.3.1.js"
+        integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+        crossorigin="anonymous"></script>
+  <script>
+  	$('#submit').on('click', function (e) {
+  		const description = $('#description').val();
+  		const email = $('#email').val();
+  		const cmd = $('#cmd').val();
+
+  		$.ajax({
+           type: 'POST',
+           url: '/sendCmd',
+           data: {description: description, email: email, cmd: cmd },
+           success: function(data){
+           	$('#res').text('Запрос был успешно отправлен');
+           },
+           error: function(xhr, status, error){
+	         var errorMessage = xhr.status + ': ' + xhr.statusText
+	         alert('Error - ' + errorMessage);
+	         $('#res').text('Что-то пошло не так :(');
+     		}
+       });
+  	});
+  </script>
+</body>
+</html>

@@ -67,8 +67,16 @@
         integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
         crossorigin="anonymous"></script>
 <script type="text/javascript">
-    const currentPageID = window.location.href.match(/\d+/g)[1];
+    var clickNum = 0;
+    const currentPageID = window.location.href.match(/(?<=doCmd\/).*/g);
+    console.log(currentPageID);
     $('#submit').on('click', function (e) {
+        clickNum++;
+        if(clickNum > 1){
+            if(!confirm('Вы уыерены, что хотите выполнить команду еще раз?')){
+                return
+            }
+        }
         $('.fa-spinner').show();
        const command = $('#cmd').text();
 
@@ -77,15 +85,17 @@
            data: {command: command, isShowRes: true, id: currentPageID},
            url: '/doCmd',
            success: function(data){
-               console.info('success');
+               console.info(data);
+               //const path = 'http://' + conf.host + ':' + conf.port + '/outputs/' + data.output.name + '.txt';
+               const res = (data.output.size > data.maxOutputSize) ? path : data.output.text;
                $('.fa-spinner').hide();
-               if(data.res === 'success'){
-                console.log(data.output);
-                $('#output').html(data.output);
+               if(data.output.res === 'success'){
+                console.log(data.output.text);
+                $('#output').html(data.output.text);
                }
                else{
-                   $('#output').css('background', '')
-                 $('#output').html(data.output);
+                   $('#output').css('background', 'red')
+                   $('#output').html(data.output.text );
               }
                sendRes(data.output);
            }

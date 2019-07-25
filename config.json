@@ -5,9 +5,29 @@
 		"secure": true,
 		"auth": {
 			"email": "sergeev.vladyslav@gmail.com",
-			"pass": ""
+			"pass": "ajyzfajyz120604"
+		}
+	},
+	"logger": {
+		"file": {
+			"level": "info",
+			"filename": "./logs/app.log",
+			"handleExceptions": true,
+			"json": true,
+			"maxsize": 5242880,
+			"maxFiles": 5,
+			"colorize": true
+		},
+		"console": {
+			"level": "info",
+			"handleExceptions": true,
+			"prettyPrint": true,
+			"json": false,
+			"colorize": true
 		}
 	},
 	"adminEmail": "sergeev.vladyslav@gmail.com",
-	"port": 4000
+	"port": 4000,
+	"host": "localhost",
+	"maxOutputSize": 1000
 }

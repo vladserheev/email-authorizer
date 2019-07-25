@@ -3,23 +3,30 @@ const app = express();
 const path = require('path');
 const fs = require('fs');
 const ejs = require('ejs');
-const conf = JSON.parse(""+fs.readFileSync("./config.json"));
-const port = conf.port;
 const bodyParser = require('body-parser');
 
+const conf = JSON.parse(""+fs.readFileSync("./config.json"));
+const port = conf.port;
+
+const core = require('./src/core');
 const term = require('./src/workWithTerm');
 const nodemailer = require('./src/nodemailer');
-const core = require('./src/core');
+const {createLogger} = require('./src/logger');
 
+const log = createLogger(conf.logger);
+//const transporter = createTransporter(conf, log);
+// console.log(transporter);
 app.use(express.static("public"));
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({
 	extended: true
 }));
 app.use(bodyParser.json());
+app.use('/outputs', express.static(__dirname + '/outputs'));
 // app.use(function(req, res, next) {
 // 	return res.status(404).send('<h3>Стрвница не найдена!</h3>');
 // });
+
 
 app.get('/', function (req, res){
     console.log('ip;', req.ipInfo);
@@ -38,28 +45,38 @@ app.get('/doCmd/:id', function (req, res, next) {
 });
 
 
-app.post('/doCmd', (req, res) => {
+app.post('/doCmd', async (req, res) => {
     if(!req.body) res.sendStatus(400);
-
+	log.info('.. /doCmd');
 	const cmd = req.body.command;
 	const id = req.body.id;
+
+	log.info('user id: ' + id);
+	log.info('cmd: ' + cmd);
 
 	term(cmd, function(stdout,stderr){
 		let result;
 		if(!stderr){
-			console.log(`stdout: ${stdout}`);
+			log.info('stdout: ' +  stdout);
 			result = 'success';
 		}
 		else{
-			console.error(`exec error: ${stderr}`);
+			log.error('exec error:' + stderr);
 			result = 'err';
 		}
-		const data = {
-			output: stdout || stderr,
-			res: result
-		};
 
-		core.writeDataToFile(data, id);
+        const outputName = core.createFileWithOutput(stdout || stderr, log);
+
+        const data = {
+        	output: {
+                text: stdout || stderr,
+                res: result,
+                name: outputName,
+				size: core.getFileSize('./outputs/' + outputName + '.txt', log)
+            }
+        };
+
+		core.writeDataToFile(data, id, log);
 		res.send(data);
 	});
 
@@ -67,19 +84,11 @@ app.post('/doCmd', (req, res) => {
 
 app.post('/sendCmd', async (req, res) => {
 	if(!req.body) res.sendStatus(400);
-    console.log(req.headers);
+	log.info('.. /sendCmd');
+	const transporter = await nodemailer.createTransporter(conf.emailConection, log);
 
-	const transporter = await nodemailer.createTransporter(conf.emailConection);
+	const id = core.createRandomName(6);
 
-	if(transporter){
-		console.log('transporter created');
-		res.sendStatus(400);
-	}
-
-	const id = core.createId();
-	const host = req.headers.host;
-	console.log('host: ' + host);
-	console.log('new data id:  ' + id);
 	const data = {
         description: req.body.description,
         email: req.body.email,
@@ -88,12 +97,16 @@ app.post('/sendCmd', async (req, res) => {
 		id: id
     };
 
-	core.sendCmdByMail(transporter, data, conf, host,(err, info) => {
+    log.info(req.body.email + ' - mew user');
+    log.info(data);
+    log.info(id + ' - new user id');
+
+	core.sendCmdByMail(transporter, data, conf, log, (err, info) => {
 		if(err){ // todo
-			console.log('err');
+			log.error(err);
 		}
 		else{
-            core.writeDataToFile(data, id);
+            core.writeDataToFile(data, id, log);
             res.sendStatus(200);
 		}
 
@@ -103,33 +116,37 @@ app.post('/sendCmd', async (req, res) => {
 app.post('/sendRes', async (req, res) => {
     if (!req.body) res.sendStatus(400);
 
+    log.info(".. /sendRes");
+
     const isShowFullOut = req.body.isShowFullOut;
 	const id = req.body.id;
 	const data = core.getDataById(id);
+	log.info('working with user: '+ data.email);
 
-    const transporter = await nodemailer.createTransporter(conf.emailConection);
+    const transporter = await nodemailer.createTransporter(conf.emailConection, log);
 
-	core.sendResByMail(transporter, data, isShowFullOut, (err, info) => {
+
+	await core.sendResByMail(transporter, data, isShowFullOut, conf, log, (err, info) => {
 		if(err){
-			res.sendStatus(400);
+			log.error(err);
 		}
 		else{
-			res.sendStatus(200);
+			log.debug(info);
 		}
 	});
 
-	core.sendReport(transporter, data, conf, (err, info) => {
+	await core.sendReport(transporter, data, conf, log, (err, info) => {
 		if(err){
-			res.sendStatus(400);
+            log.error(err);
 		}
 		else{
-			res.sendStatus(200);
+            log.debug(info);
 		}
 	});
 });
 
 app.listen(port, function(){
-	console.log('server is working on port: ' + port);
+	log.info('server is working on port: ' + port);
 });
 
 

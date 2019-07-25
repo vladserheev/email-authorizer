@@ -13,7 +13,7 @@ var exec = require('child_process').exec;
     //     });
     // }
 
-const foo = function(cmd, cb){
+const foo = async function(cmd, cb){
     exec(cmd, (err, stdout, stderr) => {
         if (err) {
             return cb(null, stderr);

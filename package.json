@@ -10,8 +10,13 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.18.3",
+    "crypto": "^1.0.1",
     "ejs": "^2.6.1",
     "express": "^4.16.4",
-    "nodemailer": "^6.1.0"
+    "express-async-handler": "^1.1.4",
+    "json-stringify-pretty-compact": "^2.0.0",
+    "nodemailer": "^6.1.0",
+    "pastebin-js": "^1.0.2",
+    "winston": "^3.2.1"
   }
 }

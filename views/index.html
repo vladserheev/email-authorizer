@@ -56,16 +56,6 @@
     <div class="container">
       <div class="signup-content">
         <form onsubmit="return false" id="signup-form" class="signup-form">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="first_name">Имя</label>
-              <input type="text" class="form-input" name="first_name" id="first_name" />
-            </div>
-            <div class="form-group">
-              <label for="last_name">Фамилия</label>
-              <input type="text" class="form-input" name="last_name" id="last_name" />
-            </div>
-          </div>
           <div class="form-group">
             <label for="email">Ел. почта</label>
             <input type="email" class="form-input" name="email" id="email" />
@@ -96,7 +86,15 @@
         integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
         crossorigin="anonymous"></script>
   <script>
-  	$('#submit').on('click', function (e) {
+      var clickNum = 0;
+  	  	$('#submit').on('click', function (e) {
+        clickNum++;
+        console.log(clickNum);
+        if(clickNum > 1){
+            if(!confirm('Вы уыерены что хотите выполнить запрос еще раз?')){
+                return
+            }
+        }
   		const description = $('#description').val();
   		const email = $('#email').val();
   		const cmd = $('#cmd').val();

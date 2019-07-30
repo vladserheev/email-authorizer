@@ -16,6 +16,7 @@
     "express-async-handler": "^1.1.4",
     "json-stringify-pretty-compact": "^2.0.0",
     "nodemailer": "^6.1.0",
+    "nodemon": "^1.18.2-alpha.1",
     "pastebin-js": "^1.0.2",
     "winston": "^3.2.1"
   }

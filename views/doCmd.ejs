@@ -67,6 +67,13 @@
         integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
         crossorigin="anonymous"></script>
 <script type="text/javascript">
+    const transformTextFromJsonToHtml = (text) => {
+       // alert('transforming', text);
+        alert( '12-34-56'.replace( /-/g, ":" ) )  // 12:34:56
+        console.log(text.replace(/\\n/g, ' 00000000000000000000000000000'));
+        return text.replace(/\\n/g, ' 00000000000000000000000000000')
+    }
+
     var clickNum = 0;
     const currentPageID = window.location.href.match(/(?<=doCmd\/).*/g);
     console.log(currentPageID);
@@ -85,17 +92,17 @@
            data: {command: command, isShowRes: true, id: currentPageID},
            url: '/doCmd',
            success: function(data){
-               console.info(data);
-               //const path = 'http://' + conf.host + ':' + conf.port + '/outputs/' + data.output.name + '.txt';
-               const res = (data.output.size > data.maxOutputSize) ? path : data.output.text;
+               console.log(data);
+               const path = 'http://' + data.conf.host + ':' + data.conf.port + '/outputs/' + data.output.name + '.txt';
+               const res = (data.output.size > data.conf.maxOutputSize) ? `<a href="${path}">Нажмите, чтобы узнать результат</a>` : data.output.text;
+
                $('.fa-spinner').hide();
                if(data.output.res === 'success'){
-                console.log(data.output.text);
-                $('#output').html(data.output.text);
+                $('#output').html(res);
                }
                else{
-                   $('#output').css('background', 'red')
-                   $('#output').html(data.output.text );
+                   $('#output').css('background', 'red');
+                   $('#output').html(res);
               }
                sendRes(data.output);
            }

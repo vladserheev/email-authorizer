@@ -14,19 +14,15 @@ const nodemailer = require('./src/nodemailer');
 const {createLogger} = require('./src/logger');
 
 const log = createLogger(conf.logger);
-//const transporter = createTransporter(conf, log);
-// console.log(transporter);
+
 app.use(express.static("public"));
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({
 	extended: true
 }));
-app.use(bodyParser.json());
-app.use('/outputs', express.static(__dirname + '/outputs'));
-// app.use(function(req, res, next) {
-// 	return res.status(404).send('<h3>Стрвница не найдена!</h3>');
-// });
 
+app.use(bodyParser.json({strict: true}));
+app.use('/outputs', express.static(__dirname + '/outputs'));
 
 app.get('/', function (req, res){
     console.log('ip;', req.ipInfo);
@@ -77,8 +73,17 @@ app.post('/doCmd', async (req, res) => {
         };
 
 		core.writeDataToFile(data, id, log);
-		res.send(data);
+
+		data.conf = {
+			host: conf.host,
+			port: conf.port,
+			maxOutputSize: conf.maxOutputSize
+
+		};
+
+		res.json(data);
 	});
+
 
 });
 
@@ -99,11 +104,12 @@ app.post('/sendCmd', async (req, res) => {
 
     log.info(req.body.email + ' - mew user');
     log.info(data);
-    log.info(id + ' - new user id');
+    log.info(id + ' - new data id');
 
 	core.sendCmdByMail(transporter, data, conf, log, (err, info) => {
 		if(err){ // todo
 			log.error(err);
+			res.send(400, 'Сообщение не было отправленно админу!');
 		}
 		else{
             core.writeDataToFile(data, id, log);

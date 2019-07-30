@@ -32,12 +32,6 @@ const createId = () => {
     return Math.floor(Math.random() * 100);
 };
 
-// const addFieldToBdItem = (id) => {
-//     const allBd = readFile();
-//     const data = getDataById(id);
-//
-// };
-
 const readFile = () => {
     const data = fs.readFileSync('db.json');
     return JSON.parse(data);
@@ -68,8 +62,6 @@ const sendResByMail = async (transporter, data, isShowFullOut, conf, log, cb) =>
             Ваша команда была выполнена!       
             `;
     }
-
-    //data.email = 'serheyev_vladyslav@gymnasium9.kr.ua';
 
 
     let mailOptions = {

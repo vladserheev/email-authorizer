@@ -4,8 +4,8 @@
 		"port": 465,
 		"secure": true,
 		"auth": {
-			"email": "sergeev.vladyslav@gmail.com",
-			"pass": "ajyzfajyz120604"
+			"email": "",
+			"pass": ""
 		}
 	},
 	"logger": {
